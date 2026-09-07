@@ -1,0 +1,8 @@
+android_app {
+    name: "CarsonSettings",
+    manifest: "AndroidManifest.xml",
+    srcs: ["src/**/*.java"],
+    platform_apis: true,
+    privileged: true,
+    certificate: "platform",
+}
