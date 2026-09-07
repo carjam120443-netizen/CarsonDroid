@@ -1,0 +1,74 @@
+name: CarsonDroid ISO - Direct Linux Build
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  build-iso:
+    # Runs directly on the dedicated Linux AOSP build host.
+    # No Android VM or nested Cuttlefish VM is launched.
+    runs-on: [self-hosted, linux, x86_64, aosp]
+    timeout-minutes: 1440
+    env:
+      CARSON_AOSP_DIR: /opt/aosp/aosp-carsondroid
+      CARSON_AOSP_BRANCH: android-latest-release
+      CARSON_SYNC_JOBS: 8
+      USE_CCACHE: 1
+      CCACHE_DIR: /opt/ccache/carsondroid
+    steps:
+      - name: Checkout CarsonDroid
+        uses: actions/checkout@v4
+
+      - name: Verify Linux AOSP host
+        run: ./build-machine/check-host.sh
+
+      - name: Install or verify host dependencies
+        run: ./scripts/install-host-deps.sh
+
+      - name: Sync Android 17 AOSP
+        run: ./scripts/setup-aosp.sh
+
+      - name: Build CarsonDroid Android artifacts
+        run: ./scripts/build-carson.sh
+
+      - name: Build CarsonDroid ISO
+        run: ./scripts/build-iso.sh
+
+      - name: Build release bundle
+        run: ./scripts/build-release-bundle.sh
+
+      - name: Verify generated ISO
+        run: |
+          test -s out/CarsonDroid-x86_64.iso
+          file out/CarsonDroid-x86_64.iso
+          ls -lh out/CarsonDroid-x86_64.iso
+
+      - name: Upload CarsonDroid ISO
+        uses: actions/upload-artifact@v4
+        with:
+          name: CarsonDroid-x86_64-ISO
+          if-no-files-found: error
+          retention-days: 14
+          path: out/CarsonDroid-x86_64.iso
+
+      - name: Upload disk image
+        uses: actions/upload-artifact@v4
+        with:
+          name: CarsonDroid-x86_64-disk-image
+          if-no-files-found: warn
+          retention-days: 14
+          path: out/CarsonDroid-x86_64.img
+
+      - name: Upload release bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: CarsonDroid-x86_64-release
+          if-no-files-found: warn
+          retention-days: 14
+          path: out/CarsonDroid-*.tar.gz
