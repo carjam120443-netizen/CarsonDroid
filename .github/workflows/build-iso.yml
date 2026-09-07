@@ -1,0 +1,42 @@
+name: CarsonDroid ISO
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_aosp:
+        description: Build AOSP before packaging
+        required: true
+        default: true
+        type: boolean
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-iso:
+    # Full AOSP builds require a large Linux host and are intentionally not
+    # attempted on GitHub-hosted runners.
+    runs-on: [self-hosted, linux, x86_64, aosp]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install host dependencies
+        run: ./scripts/install-host-deps.sh
+      - name: Sync AOSP
+        run: ./scripts/setup-aosp.sh
+      - name: Build CarsonDroid
+        if: ${{ inputs.build_aosp != false }}
+        run: ./scripts/build-carson.sh
+      - name: Build disk image layout
+        run: ./scripts/build-disk-image.sh
+      - name: Build ISO
+        run: ./scripts/build-iso.sh
+      - name: Build release bundle
+        run: ./scripts/build-release-bundle.sh
+      - name: Upload ISO
+        uses: actions/upload-artifact@v4
+        with:
+          name: CarsonDroid-x86_64-iso
+          path: |
+            out/CarsonDroid-x86_64.iso
+            out/CarsonDroid-x86_64.img
+            out/CarsonDroid-*.tar.gz
