@@ -1,0 +1,55 @@
+name: CarsonDroid AOSP Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      clean:
+        description: Clean AOSP output before building
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  build:
+    # AOSP needs a large Linux disk and is intentionally not run on the small
+    # standard GitHub-hosted runners.
+    runs-on: [self-hosted, Linux, x64, aosp-builder]
+    timeout-minutes: 720
+
+    steps:
+      - name: Checkout CarsonDroid
+        uses: actions/checkout@v4
+
+      - name: Prepare host tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v repo
+          command -v git
+          command -v python3
+
+      - name: Sync AOSP
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./scripts/setup-aosp.sh
+
+      - name: Clean output
+        if: ${{ inputs.clean }}
+        shell: bash
+        run: |
+          rm -rf "${GITHUB_WORKSPACE}/../aosp-carsondroid/out"
+
+      - name: Build CarsonDroid
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./scripts/build-carson.sh
+          ./scripts/make-release.sh
+
+      - name: Upload release bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: CarsonDroid-release
+          path: out/release/*.tar.gz
+          if-no-files-found: error
