@@ -1,0 +1,58 @@
+CARSONDROID CUSTOM LICENSE v1.0
+
+Copyright (c) 2026 CarsonDroid Project
+
+1. Permission
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of the original CarsonDroid project files covered by this license (the
+"CarsonDroid Work"), to use, copy, modify, merge, publish, distribute, and
+create derivative works from those files, subject to the conditions below.
+
+2. Conditions
+
+A. Attribution
+
+Redistributions of CarsonDroid source or substantial portions of the original
+CarsonDroid Work must retain this license and the original CarsonDroid
+copyright notice.
+
+B. Source Changes
+
+Modified versions must clearly state that they have been modified from the
+original CarsonDroid Work. This notice may be placed in documentation, a
+release page, or another reasonable location accompanying the modified work.
+
+C. Branding
+
+This license does not grant permission to use the CarsonDroid name, logos,
+trademarks, artwork, or other branding to imply that a modified distribution
+is an official release of the CarsonDroid Project. Modified distributions may
+refer to CarsonDroid as an upstream project when doing so accurately.
+
+D. Third-Party Components
+
+This license applies only to original CarsonDroid material that is explicitly
+covered by it. Android Open Source Project code, Linux code, third-party
+libraries, firmware, drivers, artwork, and other bundled components remain
+under their respective licenses and notices.
+
+E. No Warranty
+
+THE CARSONDROID WORK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+CARSONDROID PROJECT OR ITS CONTRIBUTORS BE LIABLE FOR ANY CLAIM, DAMAGES, OR
+OTHER LIABILITY ARISING FROM THE USE OF THE WORK.
+
+3. License Scope
+
+This license covers only files that identify themselves as being licensed
+under the CarsonDroid Custom License v1.0. A different license or upstream
+license stated inside a file takes precedence for that file.
+
+4. Compatibility Notice
+
+CarsonDroid is an independent project built around open-source components.
+Nothing in this license changes the licenses of upstream projects or grants
+rights to third-party trademarks.
