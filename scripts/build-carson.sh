@@ -9,7 +9,6 @@ if [[ ! -d "${AOSP_DIR}/.repo" ]]; then
   exit 1
 fi
 
-# Overlay the CarsonDroid-owned trees into the AOSP checkout.
 for tree in device vendor packages/apps; do
   mkdir -p "${AOSP_DIR}/${tree}"
   cp -a "${ROOT}/${tree}/." "${AOSP_DIR}/${tree}/"
@@ -17,13 +16,15 @@ done
 
 cd "${AOSP_DIR}"
 source build/envsetup.sh
-lunch carsondroid_x86_64-userdebug
 
-# The first milestone is a complete, bootable x86_64 Cuttlefish build.
+LUNCH_TARGET="${CARSON_LUNCH_TARGET:-aosp_cf_x86_64_phone-aosp_current-userdebug}"
+echo "Building target: ${LUNCH_TARGET}"
+lunch "${LUNCH_TARGET}"
+
 m "${CARSON_MAKE_ARGS:--j$(nproc)}" dist
 
 mkdir -p "${ROOT}/out/dist"
 cp -a out/dist/. "${ROOT}/out/dist/"
 
 echo
-echo "CarsonDroid build finished. Artifacts are in: ${ROOT}/out/dist"
+echo "CarsonDroid/AOSP build finished. Artifacts are in: ${ROOT}/out/dist"
