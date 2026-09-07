@@ -12,31 +12,63 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   build-iso:
     # Full AOSP builds require a large Linux host and are intentionally not
     # attempted on GitHub-hosted runners.
     runs-on: [self-hosted, linux, x86_64, aosp]
+    timeout-minutes: 1440
     steps:
       - uses: actions/checkout@v4
+
       - name: Install host dependencies
         run: ./scripts/install-host-deps.sh
+
       - name: Sync AOSP
         run: ./scripts/setup-aosp.sh
+
       - name: Build CarsonDroid
         if: ${{ inputs.build_aosp != false }}
         run: ./scripts/build-carson.sh
+
       - name: Build disk image layout
         run: ./scripts/build-disk-image.sh
+
       - name: Build ISO
         run: ./scripts/build-iso.sh
+
       - name: Build release bundle
         run: ./scripts/build-release-bundle.sh
-      - name: Upload ISO
+
+      - name: Verify release files
+        run: |
+          test -s out/CarsonDroid-x86_64.iso
+          test -s out/CarsonDroid-x86_64.img || true
+          ls -lh out/CarsonDroid-x86_64.iso out/CarsonDroid-x86_64.img out/CarsonDroid-*.tar.gz 2>/dev/null || true
+
+      - name: Upload workflow artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: CarsonDroid-x86_64-iso
+          name: CarsonDroid-x86_64-release
+          if-no-files-found: error
+          retention-days: 14
           path: |
             out/CarsonDroid-x86_64.iso
             out/CarsonDroid-x86_64.img
             out/CarsonDroid-*.tar.gz
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          gh release create "$TAG_NAME" \
+            out/CarsonDroid-x86_64.iso \
+            out/CarsonDroid-x86_64.img \
+            out/CarsonDroid-*.tar.gz \
+            --title "CarsonDroid $TAG_NAME" \
+            --generate-notes
