@@ -1,0 +1,26 @@
+name: Validate CarsonDroid
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate project files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f README.md
+          test -f scripts/setup-aosp.sh
+          test -f scripts/build-carson.sh
+          test -f device/carson/x86_64/AndroidProducts.mk
+          test -f device/carson/x86_64/carsondroid_x86_64.mk
+          bash -n scripts/setup-aosp.sh
+          bash -n scripts/build-carson.sh
+          bash -n scripts/build-vm.sh
+          bash -n scripts/make-release.sh
